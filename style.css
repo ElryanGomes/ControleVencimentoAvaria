@@ -1,0 +1,218 @@
+/* style.css - Visual Dark/Evolutivo */
+
+/* --- Variáveis de Cores Neon (para o Status) --- */
+:root {
+  --color-bg: #121212; /* Fundo principal escuro */
+  --color-surface: #1e1e1e; /* Fundo de elementos (header, cards, table) */
+  --color-text: #e0e0e0; /* Texto principal claro */
+  --color-text-muted: #a0a0a0; /* Texto secundário */
+  
+  /* Cores de Acordo com o Status (Versão Neon/Neon Muted) */
+  --status-longe: #757575;     /* Cinza médio neutro */
+  --status-organizar: #00e676; /* Verde Neon */
+  --status-avencer: #ffee33;   /* Amarelo Neon */
+  --status-emrisco: #ff1744;   /* Vermelho Neon */
+  --status-vencidos: #ffffff;  /* Branco puro (com fundo preto no card) */
+}
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* Fonte mais moderna */
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+#app {
+    width: 100%;
+    max-width: 1400px; /* Largura máxima para notebooks */
+    margin: 0 auto;
+}
+
+/* --- HEADER --- */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-surface);
+    border-bottom: 2px solid #333; /* Linha sutil de separação */
+    padding: 15px 25px;
+    margin-bottom: 30px;
+    border-radius: 8px; /* Cantos arredondados modernos */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Sombra suave */
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: color 0.3s ease, border-bottom 0.3s ease;
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--status-organizar); /* Acento verde neon ao passar o mouse */
+    border-bottom: 2px solid var(--status-organizar);
+}
+
+.category-selector {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+}
+
+.category-selector:hover {
+    color: var(--status-organizar);
+}
+
+/* --- DASHBOARD CARDS (Visual Evolutivo/Vidro) --- */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+    justify-items: center;
+}
+
+.card {
+    width: 160px;
+    height: 70px; /* Um pouco mais alto */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border-radius: 8px; /* Cantos arredondados */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    
+    /* Efeito de Vidro (Glassmorphism) sutil */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Pequena flutuação no hover */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+}
+
+.card-count {
+    font-size: 1.2rem;
+    margin-top: 4px;
+    font-weight: 800;
+}
+
+/* Cores específicas baseadas nas variáveis Neon */
+.card-longe      { color: var(--status-longe);      border-left: 4px solid var(--status-longe); }
+.card-organizar { color: var(--status-organizar);  border-left: 4px solid var(--status-organizar); box-shadow: 0 0 10px rgba(0, 230, 118, 0.2); }
+.card-avencer  { color: var(--status-avencer);   border-left: 4px solid var(--status-avencer); box-shadow: 0 0 10px rgba(255, 238, 51, 0.2); }
+.card-emrisco   { color: var(--status-emrisco);   border-left: 4px solid var(--status-emrisco); box-shadow: 0 0 10px rgba(255, 23, 68, 0.2); }
+
+/* Vencidos mantém o fundo preto/preto intenso para contraste, mas com o neon branco */
+.card-vencidos {
+    background-color: #000;
+    color: var(--status-vencidos);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* --- TABELA DE PRODUTOS --- */
+.products-list {
+    width: 100%;
+    background-color: var(--color-surface);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.product-table thead th {
+    text-align: left;
+    padding: 15px 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-bottom: 2px solid #333;
+    color: var(--color-text-muted);
+    text-transform: uppercase; /* Dá um ar mais profissional/industrial */
+    letter-spacing: 1px;
+}
+
+.product-table tbody tr {
+    border-bottom: 1px solid #2a2a2a;
+    transition: background-color 0.2s ease;
+}
+
+.product-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03); /* Hover sutil na linha */
+}
+
+.product-table tbody td {
+    padding: 15px 10px;
+    font-size: 1rem;
+    color: var(--color-text);
+}
+
+/* Centralizando colunas de números */
+.product-table th:nth-child(1), .product-table td:nth-child(1),
+.product-table th:nth-child(4), .product-table td:nth-child(4),
+.product-table th:nth-child(6), .product-table td:nth-child(6) {
+    text-align: center;
+}
+
+/* Estilização específica da coluna Status na tabela */
+.product-table td:last-child {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+/* Você pode adicionar essas classes via TypeScript depois para colorir o texto na tabela */
+.status-longe      { color: var(--status-longe); }
+.status-organizar { color: var(--status-organizar); }
+.status-avencer  { color: var(--status-avencer); }
+.status-emrisco   { color: var(--status-emrisco); }
+.status-vencidos  { color: #ff1744; text-decoration: line-through; } /* Vencido na tabela pode ser vermelho intenso e riscado */
+
+
+.btn-avaria {
+    background: transparent;
+    border: 1px solid var(--status-emrisco);
+    color: var(--status-emrisco);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-avaria:hover {
+    background: var(--status-emrisco);
+    color: white;
+}

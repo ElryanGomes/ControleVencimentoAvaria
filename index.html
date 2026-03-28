@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Vencimentos</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div id="app">
+        <header class="main-header">
+            <nav class="nav-links">
+                <a href="#" class="active">DashBoard</a>
+                <a href="#">Adicionar</a>
+                <a href="#">Relatório</a>
+            </nav>
+            <div class="category-selector">
+                <span>Alimenticios ^</span>
+            </div>
+        </header>
+
+        <section class="dashboard-cards">
+            <div class="card card-longe">Longe:<br><span id="count-longe" class="card-count">0</span></div>
+            <div class="card card-organizar">Organizar:<br><span id="count-organizar" class="card-count">0</span></div>
+            <div class="card card-avencer">A vencer:<br><span id="count-avencer" class="card-count">0</span></div>
+            <div class="card card-emrisco">Em risco:<br><span id="count-emrisco" class="card-count">0</span></div>
+            <div class="card card-vencidos">Vencidos:<br><span id="count-vencidos" class="card-count">0</span></div>
+        </section>
+
+        <section class="products-list">
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Setor</th>
+                        <th>Codigo</th>
+                        <th>Descrição</th>
+                        <th>Quantidade</th>
+                        <th>Validade</th>
+                        <th>Dias Restantes</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="product-tbody">
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+</body>
+
+</html>

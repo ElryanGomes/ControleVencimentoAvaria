@@ -1,0 +1,22 @@
+{
+  "name": "controlevencimentoavaria",
+  "version": "1.0.0",
+  "description": "rodar arquivo: ts-node app.ts",
+  "main": "app.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3"
+  },
+  "dependencies": {
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7"
+  }
+}
