@@ -1,73 +1,51 @@
-// src/main.ts
 import { Produto } from './types';
-import { calcularStatus } from './utils';
+import { calcularStatus, formatarDataParaInput } from './utils/date';
+import { ProdutoService, listaProdutos } from './services/produtoService';
+import { UI } from './ui/dom';
 
-// Dados de exemplo (depois virão do banco de dados/Supabase)
-const produtosExemplo: Produto[] = [
-  {
-    codigoBarra: "7891234567890",
-    nome: "Biscoito Piraquê Supreme",
-    fornecedor: "Piraquê",
-    validade: new Date("2026-12-24"),
-    quantidade: 10,
-    proximoLote: new Date("2026-06-01"),
-    status: 'longe',
-    avaria: 0
-  },
-  {
-    codigoBarra: "789000111222",
-    nome: "Leite Integral 1L",
-    fornecedor: "Betânia",
-    validade: new Date("2026-04-05"), // Próximo de hoje (28/03/2026)
-    quantidade: 50,
-    proximoLote: new Date("2026-04-10"),
-    status: 'em risco',
-    avaria: 0
-  }
-];
+// Estado global da tela
+let produtoSelecionado: Produto | null = null;
+let indexEditando: number | null = null;
+const PLACEHOLDER_IMG = "https://i0.wp.com/espaferro.com.br/wp-content/uploads/2024/06/placeholder-83.png?fit=1200%2C800&ssl=1&w=640";
 
+// Função de Renderização (Desenhar a tabela)
 function renderizarTabela() {
-  const tbody = document.getElementById('product-tbody');
-  if (!tbody) return;
+    const tbody = document.getElementById('product-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = "";
 
-  tbody.innerHTML = ""; // Limpa a tabela antes de renderizar
+    // Busca a lista que está lá no Service
+    listaProdutos.forEach((produto) => {
+        const status = calcularStatus(produto.validade);
+        const tr = document.createElement('tr');
+        
+        tr.innerHTML = `
+            <td>1</td>
+            <td title="${produto.nome}">${produto.nome}</td>
+            <td>${produto.quantidade}</td>
+            <td>${produto.validade.toLocaleDateString('pt-BR')}</td>
+            <td class="status-${status}">${status.toUpperCase()}</td>
+        `;
 
-  produtosExemplo.forEach(produto => {
-    const hoje = new Date();
-    const diffTime = produto.validade.getTime() - hoje.getTime();
-    const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    // Atualiza o status em tempo real baseada na data de hoje
-    const statusAtualizado = calcularStatus(produto.validade);
+        tr.onclick = () => {
+            produtoSelecionado = produto; // Salva quem foi clicado
+            UI.preencherModal(produto, PLACEHOLDER_IMG);
+            (document.getElementById('modal-container')!).style.display = 'flex';
+        };
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>1</td>
-      <td>${produto.codigoBarra}</td>
-      <td>${produto.nome}</td>
-      <td>${produto.quantidade}</td>
-      <td>${produto.validade.toLocaleDateString('pt-BR')}</td>
-      <td>${diasRestantes < 0 ? 'Expirado' : diasRestantes + ' dias'}</td>
-      <td class="status-${statusAtualizado}">${statusAtualizado.toUpperCase()}</td>
-      <td>
-        <button class="btn-avaria" onclick="console.log('Registrar avaria para ${produto.nome}')">⚠️ Avaria</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
+        tbody.appendChild(tr);
+    });
 
-  atualizarCards();
+    atualizarCards();
 }
 
 function atualizarCards() {
-    // Lógica para contar quantos de cada status existem e exibir nos spans id="count-..."
     const counts = { longe: 0, organizar: 0, 'a vencer': 0, 'em risco': 0, vencido: 0 };
-    
-    produtosExemplo.forEach(p => {
-        const status = calcularStatus(p.validade);
-        counts[status as keyof typeof counts]++;
+    listaProdutos.forEach(p => {
+        const s = calcularStatus(p.validade);
+        counts[s as keyof typeof counts]++;
     });
-
+    
     document.getElementById('count-longe')!.innerText = counts.longe.toString();
     document.getElementById('count-organizar')!.innerText = counts.organizar.toString();
     document.getElementById('count-avencer')!.innerText = counts['a vencer'].toString();
@@ -75,5 +53,73 @@ function atualizarCards() {
     document.getElementById('count-vencidos')!.innerText = counts.vencido.toString();
 }
 
-// Inicia a página
+// Eventos do Formulário (Salvar)
+document.getElementById('form-produto')!.onsubmit = (e) => {
+    e.preventDefault();
+
+    const dados: Produto = {
+        codigoBarra: (document.getElementById('ipt-codigo') as HTMLInputElement).value,
+        nome: (document.getElementById('ipt-nome') as HTMLInputElement).value,
+        setor: (document.getElementById('ipt-setor') as HTMLInputElement).value,
+        fornecedor: (document.getElementById('ipt-fornecedor') as HTMLInputElement).value,
+        validade: new Date((document.getElementById('ipt-validade') as HTMLInputElement).value + "T12:00:00"),
+        quantidade: Number((document.getElementById('ipt-qtd') as HTMLInputElement).value),
+        proximoLote: new Date((document.getElementById('ipt-lote') as HTMLInputElement).value + "T12:00:00"),
+        status: 'longe',
+        avaria: 0
+    };
+
+    if (indexEditando !== null) {
+        ProdutoService.atualizar(indexEditando, dados);
+    } else {
+        ProdutoService.adicionar(dados);
+    }
+
+    UI.trocarTela('tela-home', 'tela-adicionar');
+    renderizarTabela();
+    indexEditando = null;
+};
+
+// Botões de Ação (Editar / Excluir)
+document.getElementById('btn-excluir-produto')!.onclick = () => {
+    if (produtoSelecionado) {
+        if (confirm(`Excluir ${produtoSelecionado.nome}?`)) {
+            ProdutoService.excluir(produtoSelecionado.codigoBarra);
+            (document.getElementById('modal-container')!).style.display = 'none';
+            renderizarTabela();
+        }
+    }
+};
+
+document.getElementById('btn-editar-produto')!.onclick = () => {
+    if (produtoSelecionado) {
+        indexEditando = listaProdutos.findIndex(p => p.codigoBarra === produtoSelecionado?.codigoBarra);
+        UI.trocarTela('tela-adicionar', 'tela-home');
+        (document.getElementById('modal-container')!).style.display = 'none';
+        
+        // Preenche os inputs para edição
+        (document.getElementById('ipt-codigo') as HTMLInputElement).value = produtoSelecionado.codigoBarra;
+        (document.getElementById('ipt-nome') as HTMLInputElement).value = produtoSelecionado.nome;
+        (document.getElementById('ipt-setor') as HTMLInputElement).value = produtoSelecionado.setor;
+        (document.getElementById('ipt-fornecedor') as HTMLInputElement).value = produtoSelecionado.fornecedor;
+        (document.getElementById('ipt-validade') as HTMLInputElement).value = formatarDataParaInput(produtoSelecionado.validade);
+        (document.getElementById('ipt-qtd') as HTMLInputElement).value = produtoSelecionado.quantidade.toString();
+        (document.getElementById('ipt-lote') as HTMLInputElement).value = formatarDataParaInput(produtoSelecionado.proximoLote);
+    }
+};
+
+// Cliques de Navegação e Fechar Modal
+document.getElementById('modal-close')!.onclick = () => (document.getElementById('modal-container')!).style.display = 'none';
+document.getElementById('btn-cancelar')!.onclick = () => UI.trocarTela('tela-home', 'tela-adicionar');
+
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        const texto = (e.target as HTMLElement).innerText;
+        if (texto === "Adicionar") UI.trocarTela('tela-adicionar', 'tela-home');
+        if (texto === "DashBoard") UI.trocarTela('tela-home', 'tela-adicionar');
+    });
+});
+
+
+
 renderizarTabela();
